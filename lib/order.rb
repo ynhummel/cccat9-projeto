@@ -17,46 +17,35 @@ class Order
   private
 
   def initialize_cpf(cpf)
-    return cpf if validate_cpf(str: cpf)
+    return cpf if validate_cpf(cpf: cpf)
 
     raise 'Invalid CPF'
   end
 
-  def validate_cpf(str:)
-    if !str.nil?
-      if str.length >= 11 || str.length <= 14
-        str = str.gsub(' ', '').gsub('.', '').gsub('-', '').gsub(' ', '')
-        if str.split('').uniq.size != 1
-          begin
-            d1 = d2 = dg1 = dg2 = rest = 0
-            (1...str.length - 1).each do |count|
-              digito = str[count - 1...count].to_i
-              d1 = d1 + (11 - count) * digito
-              d2 = d2 + (12 - count) * digito
-            end
-            rest = d1 % 11
-            dg1 = rest < 2 ? 0 : 11 - rest
-            d2 += 2 * dg1
-            rest = d2 % 11
-            if rest < 2
-              dg2 = 0
-            else
-              dg2 = 11 - rest
-            end
-            dig_verific = str[str.length - 2, str.length]
-            dig_result = '' + dg1.to_s + '' + dg2.to_s
-            dig_verific == dig_result
-          rescue StandardError => e
-            puts "Erro: #{e}"
-            false
-          end
-        else
-          false
-        end
-      else
-        false
+  def validate_cpf(cpf:)
+    return false if cpf.nil?
+    return false unless cpf.length >= 11 || cpf.length <= 14
+
+    cpf = cpf.gsub(' ', '').gsub('.', '').gsub('-', '').gsub(' ', '')
+    return false unless cpf.split('').uniq.size != 1
+
+    begin
+      d1 = d2 = 0
+      (1...cpf.length - 1).each do |count|
+        digito = cpf[count - 1...count].to_i
+        d1 += (11 - count) * digito
+        d2 += (12 - count) * digito
       end
-    else
+      rest = d1 % 11
+      dg1 = rest < 2 ? 0 : 11 - rest
+      d2 += 2 * dg1
+      rest = d2 % 11
+      dg2 = rest < 2 ? 0 : 11 - rest
+      dig_verific = cpf[cpf.length - 2, cpf.length]
+      dig_result = "#{dg1}#{dg2}"
+      dig_verific == dig_result
+    rescue StandardError => e
+      puts "Erro: #{e}"
       false
     end
   end
