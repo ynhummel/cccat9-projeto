@@ -1,4 +1,4 @@
-require 'product'
+require_relative './product'
 
 class Order
   attr_reader :products
