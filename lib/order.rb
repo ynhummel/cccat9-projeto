@@ -24,30 +24,39 @@ class Order
 
   def validate_cpf(cpf:)
     return false if cpf.nil?
-    return false unless cpf.length >= 11 || cpf.length <= 14
 
-    cpf = cpf.gsub(/[ .-]/, '')
-    return false unless cpf.split('').uniq.size != 1
+    parsed_cpf = cpf.gsub(/\D/, '').split('')
+    return false if invalid_length?(cpf: parsed_cpf)
+    return false if all_digits_equal?(cpf: parsed_cpf)
 
-    begin
-      dig_result1 = dig_result2 = 0
-      cpf[0..9]
-      (1...cpf.length - 1).each do |count|
-        digito = cpf[count - 1...count].to_i
-        dig_result1 += (11 - count) * digito
-        dig_result2 += (12 - count) * digito
+    dig_result1 = digit_calculation(cpf: parsed_cpf, factor: 10)
+    dig_result2 = digit_calculation(cpf: parsed_cpf, factor: 11)
+    actual_digits = extract_digits(cpf: parsed_cpf)
+    calculated_digits = "#{dig_result1}#{dig_result2}"
+    actual_digits == calculated_digits
+  end
+
+  def extract_digits(cpf:)
+    cpf[-2..].join
+  end
+
+  def invalid_length?(cpf:)
+    cpf.length != 11
+  end
+
+  def all_digits_equal?(cpf:)
+    cpf.uniq.size == 1
+  end
+
+  def digit_calculation(cpf:, factor:)
+    total = 0
+    cpf.each do |digit|
+      if factor > 1
+        total += digit.to_i * factor
+        factor -= 1
       end
-      rest = dig_result1 % 11
-      dig_result1 = rest < 2 ? 0 : 11 - rest
-      dig_result2 += 2 * dig_result1
-      rest = dig_result2 % 11
-      dig_result2 = rest < 2 ? 0 : 11 - rest
-      dig_verific = cpf[cpf.length - 2, cpf.length]
-      dig_result = "#{dig_result1}#{dig_result2}"
-      dig_verific == dig_result
-    rescue StandardError => e
-      puts "Erro: #{e}"
-      false
     end
+    rest = total % 11
+    rest < 2 ? 0 : 11 - rest
   end
 end

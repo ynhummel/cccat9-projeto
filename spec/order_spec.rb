@@ -1,12 +1,13 @@
 # order_spec.rb
+require 'spec_helper'
 require 'order'
 
 describe Order do
   context 'Must create an Order' do
     before(:each) do
-      @caneta = Product.new(description: 'Caneta',price: 10,quantity: 3)
-      @caderno = Product.new(description: 'Caderno',price: 20,quantity: 2)
-      @borracha = Product.new(description: 'Borracha',price: 5,quantity: 1)
+      @caneta = Product.new(description: 'Caneta', price: 10, quantity: 3)
+      @caderno = Product.new(description: 'Caderno', price: 20, quantity: 2)
+      @borracha = Product.new(description: 'Borracha', price: 5, quantity: 1)
     end
 
     it 'with exactly 3 products' do
@@ -29,19 +30,38 @@ describe Order do
     end
 
     it 'and have a valid CPF' do
-      expect do
-        Order.new(cpf: '111.111.111-11',
-                  product1: @caneta,
-                  product2: @caderno,
-                  product3: @borracha)
-        end.to raise_error(StandardError)
+      valid_cpfs = [
+        '987.654.321-00',
+        '714.602.380-01',
+        '313.030.210-72',
+        '144.796.170-60'
+      ].freeze
 
-      expect do
-        Order.new(cpf: '12.123.134-21',
-                  product1: @caneta,
-                  product2: @caderno,
-                  product3: @borracha)
-        end.to raise_error(StandardError)
+      valid_cpfs.each do |cpf|
+        expect do
+          Order.new(cpf: cpf.to_s,
+                    product1: @caneta,
+                    product2: @caderno,
+                    product3: @borracha)
+        end.not_to raise_error
+      end
+    end
+
+    it 'and cant have an invalid CPF' do
+      invalid_cpfs = [
+        '111.111.111-11',
+        '222.222.222-22',
+        '333.333.333-33'
+      ].freeze
+
+      invalid_cpfs.each do |cpf|
+        expect do
+          Order.new(cpf: cpf.to_s,
+                    product1: @caneta,
+                    product2: @caderno,
+                    product3: @borracha)
+        end.to raise_error(RuntimeError)
+      end
     end
 
     it 'and can add discounts coupons' do
