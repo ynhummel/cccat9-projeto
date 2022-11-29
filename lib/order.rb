@@ -14,6 +14,29 @@ class Order
     total - total * @discount / 100
   end
 
+  # def to_json(*)
+  #   {
+  #     'cpf': @cpf,
+  #     'products': [
+  #       {
+  #         'description': @products[0].description,
+  #         'price': @products[0].price,
+  #         'quantity': @products[0].quantity
+  #       },
+  #       {
+  #         'description': @products[1].description,
+  #         'price': @products[1].price,
+  #         'quantity': @products[1].quantity
+  #       },
+  #       {
+  #         'description': @products[2].description,
+  #         'price': @products[2].price,
+  #         'quantity': @products[2].quantity
+  #       }
+  #     ]
+  #   }
+  # end
+
   private
 
   def initialize_cpf(cpf)
